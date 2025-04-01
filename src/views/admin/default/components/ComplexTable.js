@@ -1,5 +1,3 @@
-/* eslint-disable */
-
 import {
   Box,
   Flex,
@@ -23,40 +21,35 @@ import {
 } from '@tanstack/react-table';
 import Card from 'components/card/Card';
 import { useEffect, useState } from 'react';
-import Menu from 'components/menu/MainMenu';
 import * as React from 'react';
 import { MdCancel, MdCheckCircle, MdOutlineError } from 'react-icons/md';
 
 const columnHelper = createColumnHelper();
 
-// const columns = columnsDataCheck;
-export default function ComplexTable(props) {
+export default function ComplexTable() {
   const [tableData, setTableData] = useState([]);
+  const [sorting, setSorting] = React.useState([]);
+  const textColor = useColorModeValue('secondaryGray.900', 'white');
+  const borderColor = useColorModeValue('gray.200', 'whiteAlpha.100');
 
   useEffect(() => {
-    fetch(
-      'https://fleetbots-production.up.railway.app/api/fleet/status?session_id=49dd464f-0516-40aa-894c-91455e9eacf9',
-    )
+    fetch('https://fleetbots-production.up.railway.app/api/fleet/status?session_id=49dd464f-0516-40aa-894c-91455e9eacf9')
       .then((res) => res.json())
       .then((data) => {
-        // Convert response object to array and format the data for the table
+        // Format the API response data into an array
         const formattedData = Object.keys(data).map((key) => ({
-          name: key, // Rover name from API key
+          name: key, 
           status: data[key].status,
-          task: data[key].task || 'N/A', // Default to 'N/A' if no task
-          coordinates: data[key].coordinates, // Format coordinates
-          battery: data[key].battery, // Battery percentage
+          task: data[key].task || 'N/A',
+          coordinates: data[key].coordinates, 
+          battery: data[key].battery, 
         }));
 
         setTableData(formattedData);
       })
       .catch((err) => console.error('Error fetching rover data:', err));
   }, []);
-  // const { tableData } = props;
-  const [sorting, setSorting] = React.useState([]);
-  const textColor = useColorModeValue('secondaryGray.900', 'white');
-  const borderColor = useColorModeValue('gray.200', 'whiteAlpha.100');
-  let defaultData = tableData;
+
   const columns = [
     columnHelper.accessor('name', {
       id: 'name',
@@ -71,11 +64,9 @@ export default function ComplexTable(props) {
         </Text>
       ),
       cell: (info) => (
-        <Flex align="center">
-          <Text color={textColor} fontSize="sm" fontWeight="700">
-            {info.getValue()}
-          </Text>
-        </Flex>
+        <Text color={textColor} fontSize="sm" fontWeight="700">
+          {info.getValue()} {/* Accessing rover name */}
+        </Text>
       ),
     }),
     columnHelper.accessor('status', {
@@ -99,10 +90,10 @@ export default function ComplexTable(props) {
             color={
               info.getValue() === 'idle'
                 ? 'green.500'
-                : info.getValue() === 'Moving_forward' ||
-                  info.getValue() === 'Moving_backward' ||
-                  info.getValue() === 'Moving_left' ||
-                  info.getValue() === 'Moving_right'
+                : info.getValue() === 'Moving forward' ||
+                  info.getValue() === 'Moving backward' ||
+                  info.getValue() === 'Moving left' ||
+                  info.getValue() === 'Moving right'
                 ? 'red.500'
                 : info.getValue() === 'Error'
                 ? 'orange.500'
@@ -111,10 +102,10 @@ export default function ComplexTable(props) {
             as={
               info.getValue() === 'idle'
                 ? MdCheckCircle
-                : info.getValue() === 'Moving_forward' ||
-                  info.getValue() === 'Moving_backward' ||
-                  info.getValue() === 'Moving_left' ||
-                  info.getValue() === 'Moving_right'
+                : info.getValue() === 'Moving forward' ||
+                  info.getValue() === 'Moving backward' ||
+                  info.getValue() === 'Moving left' ||
+                  info.getValue() === 'Moving right'
                 ? MdCancel
                 : info.getValue() === 'Error'
                 ? MdOutlineError
@@ -157,11 +148,14 @@ export default function ComplexTable(props) {
           COORDINATES
         </Text>
       ),
-      cell: (info) => (
-        <Text color={textColor} fontSize="sm" fontWeight="700">
-          {info.getValue()}
-        </Text>
-      ),
+      cell: (info) => {
+        const coords = info.getValue();
+        return (
+          <Text color={textColor} fontSize="sm" fontWeight="700">
+            {coords ? `${coords[0]}, ${coords[1]}` : 'N/A'}
+          </Text>
+        );
+      },
     }),
     columnHelper.accessor('battery', {
       id: 'battery',
@@ -188,9 +182,9 @@ export default function ComplexTable(props) {
       ),
     }),
   ];
-  const [data, setData] = React.useState(() => [...defaultData]);
+
   const table = useReactTable({
-    data,
+    data: tableData, // Use the fetched and formatted data
     columns,
     state: {
       sorting,
@@ -198,8 +192,8 @@ export default function ComplexTable(props) {
     onSortingChange: setSorting,
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
-    debugTable: true,
   });
+
   return (
     <Card
       flexDirection="column"
@@ -208,77 +202,51 @@ export default function ComplexTable(props) {
       overflowX={{ sm: 'scroll', lg: 'hidden' }}
     >
       <Flex px="25px" mb="8px" justifyContent="space-between" align="center">
-        <Text
-          color={textColor}
-          fontSize="22px"
-          fontWeight="700"
-          lineHeight="100%"
-        >
+        <Text color={textColor} fontSize="22px" fontWeight="700" lineHeight="100%">
           Activity Table
         </Text>
-        {/* <Menu /> */}
       </Flex>
       <Box>
         <Table variant="simple" color="gray.500" mb="24px" mt="12px">
           <Thead>
             {table.getHeaderGroups().map((headerGroup) => (
               <Tr key={headerGroup.id}>
-                {headerGroup.headers.map((header) => {
-                  return (
-                    <Th
-                      key={header.id}
-                      colSpan={header.colSpan}
-                      pe="10px"
-                      borderColor={borderColor}
-                      cursor="pointer"
-                      onClick={header.column.getToggleSortingHandler()}
+                {headerGroup.headers.map((header) => (
+                  <Th
+                    key={header.id}
+                    colSpan={header.colSpan}
+                    pe="10px"
+                    borderColor={borderColor}
+                    cursor="pointer"
+                    onClick={header.column.getToggleSortingHandler()}
+                  >
+                    <Flex
+                      justifyContent="space-between"
+                      align="center"
+                      fontSize={{ sm: '10px', lg: '12px' }}
+                      color="gray.400"
                     >
-                      <Flex
-                        justifyContent="space-between"
-                        align="center"
-                        fontSize={{ sm: '10px', lg: '12px' }}
-                        color="gray.400"
-                      >
-                        {flexRender(
-                          header.column.columnDef.header,
-                          header.getContext(),
-                        )}
-                        {{
-                          asc: '',
-                          desc: '',
-                        }[header.column.getIsSorted()] ?? null}
-                      </Flex>
-                    </Th>
-                  );
-                })}
+                      {flexRender(header.column.columnDef.header, header.getContext())}
+                      {{
+                        asc: '',
+                        desc: '',
+                      }[header.column.getIsSorted()] ?? null}
+                    </Flex>
+                  </Th>
+                ))}
               </Tr>
             ))}
           </Thead>
           <Tbody>
-            {table
-              .getRowModel()
-              .rows.slice(0, 5)
-              .map((row) => {
-                return (
-                  <Tr key={row.id}>
-                    {row.getVisibleCells().map((cell) => {
-                      return (
-                        <Td
-                          key={cell.id}
-                          fontSize={{ sm: '14px' }}
-                          minW={{ sm: '150px', md: '200px', lg: 'auto' }}
-                          borderColor="transparent"
-                        >
-                          {flexRender(
-                            cell.column.columnDef.cell,
-                            cell.getContext(),
-                          )}
-                        </Td>
-                      );
-                    })}
-                  </Tr>
-                );
-              })}
+            {table.getRowModel().rows.map((row) => (
+              <Tr key={row.id}>
+                {row.getVisibleCells().map((cell) => (
+                  <Td key={cell.id} fontSize={{ sm: '14px' }} minW={{ sm: '150px', md: '200px', lg: 'auto' }} borderColor="transparent">
+                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                  </Td>
+                ))}
+              </Tr>
+            ))}
           </Tbody>
         </Table>
       </Box>

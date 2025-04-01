@@ -14,23 +14,24 @@ import React from 'react';
 import { MdAttachMoney, MdBarChart } from 'react-icons/md';
 import ComplexTable from 'views/admin/default/components/ComplexTable';
 
+import { useEffect, useState } from 'react';
 import { columnsDataComplex } from 'views/admin/default/variables/columnsData';
 import tableDataComplex from 'views/admin/default/variables/tableDataComplex.json';
 
 const statisticsData = [
   {
-    name: "Total Active Rovers",
-    value: "5", // Replace with dynamic data if available
+    name: 'Total Active Rovers',
+    value: '5', // Replace with dynamic data if available
     icon: MdBarChart,
   },
   {
-    name: "Total Idle Rovers",
-    value: "12",
+    name: 'Total Idle Rovers',
+    value: '12',
     icon: MdBarChart,
   },
   {
-    name: "Total Active Rovers",
-    value: "9",
+    name: 'Total Active Rovers',
+    value: '9',
     icon: MdBarChart,
   },
   // {
@@ -41,6 +42,45 @@ const statisticsData = [
 ];
 
 export default function UserReports() {
+  const [tableData, setTableData] = useState([]);
+  const [statistics, setStatistics] = useState({
+    totalRovers: 0,
+    activeRovers: 0,
+    idleRovers: 0,
+  });
+
+  useEffect(() => {
+    fetch(
+      'https://fleetbots-production.up.railway.app/api/fleet/status?session_id=49dd464f-0516-40aa-894c-91455e9eacf9',
+    )
+      .then((res) => res.json())
+      .then((data) => {
+        const formattedData = Object.keys(data).map((key) => ({
+          name: key,
+          status: data[key].status,
+          task: data[key].task || 'N/A',
+          coordinates: `${data[key].coordinates[0]}, ${data[key].coordinates[1]}`,
+          battery: `${data[key].battery}%`,
+        }));
+
+        setTableData(formattedData);
+
+        // Update statistics
+        const totalRovers = Object.keys(data).length;
+        const activeRovers = Object.values(data).filter(
+          (r) => r.status !== 'idle',
+        ).length;
+        const idleRovers = totalRovers - activeRovers;
+
+        setStatistics({
+          totalRovers,
+          activeRovers,
+          idleRovers,
+        });
+      })
+      .catch((err) => console.error('Error fetching rover data:', err));
+  }, []);
+
   // Chakra Color Mode
   const brandColor = useColorModeValue('brand.500', 'white');
   const boxBg = useColorModeValue('secondaryGray.300', 'whiteAlpha.100');
@@ -87,7 +127,7 @@ export default function UserReports() {
         />
         <MiniStatistics growth="+23%" name="Sales" value="$574.34" /> */}
 
-        {statisticsData.map((stat, index) => (
+        {/* {statisticsData.map((stat, index) => (
           <MiniStatistics
             key={index}
             startContent={
@@ -103,15 +143,55 @@ export default function UserReports() {
             name={stat.name}
             value={stat.value}
           />
-        ))}
+        ))} */}
+
+        
+          <MiniStatistics
+            startContent={
+              <IconBox
+                w="56px"
+                h="56px"
+                bg={boxBg}
+                icon={
+                  <Icon w="32px" h="32px" as={MdBarChart} color={brandColor} />
+                }
+              />
+            }
+            name="Total Rovers"
+            value={statistics.totalRovers}
+          />
+          <MiniStatistics
+            startContent={
+              <IconBox
+                w="56px"
+                h="56px"
+                bg={boxBg}
+                icon={
+                  <Icon w="32px" h="32px" as={MdBarChart} color={brandColor} />
+                }
+              />
+            }
+            name="Active Rovers"
+            value={statistics.activeRovers}
+          />
+          <MiniStatistics
+            startContent={
+              <IconBox
+                w="56px"
+                h="56px"
+                bg={boxBg}
+                icon={
+                  <Icon w="32px" h="32px" as={MdBarChart} color={brandColor} />
+                }
+              />
+            }
+            name="Idle Rovers"
+            value={statistics.idleRovers}
+          />
+        
       </SimpleGrid>
 
-      <SimpleGrid
-        
-        gap="20px"
-        mb="20px"
-        w="100%"
-      >
+      <SimpleGrid gap="20px" mb="20px" w="100%">
         <ComplexTable
           columnsData={columnsDataComplex}
           tableData={tableDataComplex}
