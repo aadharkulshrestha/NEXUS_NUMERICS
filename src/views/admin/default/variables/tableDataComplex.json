@@ -1,0 +1,30 @@
+[
+  {
+    "name":"ROVER 1",
+    "status": "idle",
+    "task":"Soil Irrigation",
+    "coordinates":"7,1",
+    "battery": 75.5  
+  },
+  {
+    "name":"ROVER 2",
+    "status": "Moving_backward",
+    "task":"Soil Irrigation",
+    "coordinates":"8,1",
+    "battery": 25.5  
+  },
+  {
+    "name":"ROVER 3",
+    "status": "Moving_left",
+    "task":"Soil Irrigation",
+    "coordinates":"7,2",
+    "battery": 90  
+  },
+  {
+    "name":"ROVER 4",
+    "status": "Moving_right",
+    "task":"Soil Irrigation",
+    "coordinates":"5,1",
+    "battery": 50.5  
+  }
+]
