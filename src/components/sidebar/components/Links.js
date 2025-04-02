@@ -52,7 +52,9 @@ export function SidebarLinks(props) {
         route.layout === '/auth' ||
         route.layout === '/rtl' ||
         route.layout === '/admin/aboutUs' ||
-        route.layout === '/admin/contactUs'
+        route.layout === '/admin/contactUs' ||
+        route.layout === '/admin/Highlights' ||
+        route.layout === '/admin/MissionandVission'
       ) {
         return (
           <NavLink key={index} to={route.layout + route.path}>
@@ -140,3 +142,5 @@ export function SidebarLinks(props) {
 }
 
 export default SidebarLinks;
+
+

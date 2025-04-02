@@ -29,26 +29,77 @@ const columnHelper = createColumnHelper();
 export default function ComplexTable() {
   const [tableData, setTableData] = useState([]);
   const [sorting, setSorting] = React.useState([]);
+  const [apiStatus, setApiStatus] = useState("Connected");
+  const [lastUpdate, setLastUpdate] = useState({});
   const textColor = useColorModeValue('secondaryGray.900', 'white');
   const borderColor = useColorModeValue('gray.200', 'whiteAlpha.100');
 
   useEffect(() => {
-    fetch('https://fleetbots-production.up.railway.app/api/fleet/status?session_id=49dd464f-0516-40aa-894c-91455e9eacf9')
-      .then((res) => res.json())
-      .then((data) => {
-        // Format the API response data into an array
-        const formattedData = Object.keys(data).map((key) => ({
-          name: key, 
-          status: data[key].status,
-          task: data[key].task || 'N/A',
-          coordinates: data[key].coordinates, 
-          battery: data[key].battery, 
+    const fetchData = async (retryCount = 0) => {
+      try {
+        const response = await fetch('https://fleetbots-production.up.railway.app/api/fleet/status?session_id=49dd464f-0516-40aa-894c-91455e9eacf9');
+        if (!response.ok) throw new Error("API request failed");
+
+        const data = await response.json();
+        const currentTime = Date.now();
+        const updatedData = {};
+
+        Object.keys(data).forEach((roverID) => {
+          // Sensor failure detection: check if coordinates have not changed for more than 10 seconds
+          if (
+            lastUpdate[roverID] &&
+            JSON.stringify(data[roverID].coordinates) === JSON.stringify(lastUpdate[roverID].coordinates)
+          ) {
+            if (currentTime - (lastUpdate[roverID].time || 0) > 10000) {
+              data[roverID].sensorError = "GPS Not Updating";
+            }
+          }
+
+          // Handle low battery condition (battery < 20%)
+          if (data[roverID].battery < 20) {
+            data[roverID].batteryWarning = "Low Battery!";
+          }
+
+          updatedData[roverID] = data[roverID];
+        });
+
+        setTableData(
+          Object.keys(updatedData).map((key) => ({
+            name: key,
+            status: updatedData[key].status,
+            task: updatedData[key].task || 'N/A',
+            coordinates: updatedData[key].coordinates,
+            battery: updatedData[key].battery,
+            sensorError: updatedData[key].sensorError,
+            batteryWarning: updatedData[key].batteryWarning,
+          }))
+        );
+
+        setLastUpdate((prev) => ({
+          ...prev,
+          ...Object.fromEntries(
+            Object.keys(updatedData).map((id) => [
+              id,
+              { coordinates: updatedData[id].coordinates, time: currentTime }
+            ])
+          ),
         }));
 
-        setTableData(formattedData);
-      })
-      .catch((err) => console.error('Error fetching rover data:', err));
-  }, []);
+        setApiStatus("Connected");
+      } catch (error) {
+        if (retryCount < 3) {
+          setTimeout(() => fetchData(retryCount + 1), 2000 * (retryCount + 1)); // Retry with exponential backoff
+        } else {
+          setApiStatus("API Unresponsive");
+        }
+      }
+    };
+
+    fetchData(); // Initial fetch
+    const interval = setInterval(fetchData, 5000); // Polling every 5s
+
+    return () => clearInterval(interval); // Cleanup interval
+  }, [lastUpdate]);
 
   const columns = [
     columnHelper.accessor('name', {
@@ -182,6 +233,11 @@ export default function ComplexTable() {
           <Text ml="2" color={textColor} fontSize="sm" fontWeight="700">
             {info.getValue()}%
           </Text>
+          {info.getValue() < 20 && (
+            <Text color="red.500" fontSize="sm" fontWeight="700">
+              Low Battery! Safe Mode Activated.
+            </Text>
+          )}
         </Flex>
       ),
     }),

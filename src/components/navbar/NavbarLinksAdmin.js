@@ -1,4 +1,3 @@
-// Chakra Imports
 import {
   Avatar,
   Button,
@@ -99,7 +98,7 @@ export default function HeaderLinks(props) {
         </Text>
       </Flex>
       <SidebarResponsive routes={routes} />
-      <Menu>
+      {/* <Menu>
         <MenuButton p="0px">
           <Icon
             mt="6px"
@@ -156,7 +155,7 @@ export default function HeaderLinks(props) {
             </MenuItem>
           </Flex>
         </MenuList>
-      </Menu>
+      </Menu> */}
 
       {/*  */}
 
@@ -213,7 +212,7 @@ export default function HeaderLinks(props) {
               👋&nbsp; Hey, Aadhar Kulshretha
             </Text>
           </Flex>
-          <Flex flexDirection="column" p="10px">
+          {/* <Flex flexDirection="column" p="10px">
             <MenuItem
               _hover={{ bg: 'none' }}
               _focus={{ bg: 'none' }}
@@ -239,7 +238,7 @@ export default function HeaderLinks(props) {
             >
               <Text fontSize="sm">Log out</Text>
             </MenuItem>
-          </Flex>
+          </Flex> */}
         </MenuList>
       </Menu>
     </Flex>

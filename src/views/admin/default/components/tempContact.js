@@ -98,7 +98,7 @@ export default function ContactUs(props) {
   };
   const getRoutes = (routes) => {
     return routes.map((route, key) => {
-      if (route.layout === '/admin/aboutUs') {
+      if (route.layout === '/admin/contactUs') {
         return (
           <Route path={`${route.path}`} element={route.component} key={key} />
         );
@@ -200,3 +200,4 @@ export default function ContactUs(props) {
     </Box>
   );
 }
+

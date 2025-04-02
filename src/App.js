@@ -5,6 +5,8 @@ import AuthLayout from './layouts/auth';
 import AdminLayout from './layouts/admin';
 import AboutUs from '../src/views/admin/default/components/tempAbout';
 import ContactUs from './views/admin/default/components/tempContact';
+import MissionandVision from './views/admin/default/components/Mision';
+import Highlights from './views/admin/default/components/Highlight';
 import RTLLayout from './layouts/rtl';
 import {
   ChakraProvider,
@@ -12,6 +14,7 @@ import {
 } from '@chakra-ui/react';
 import initialTheme from './theme/theme'; //  { themeGreen }
 import { useState } from 'react';
+import Mission from './views/admin/default/components/Mision';
 // Chakra imports
 
 export default function Main() {
@@ -30,15 +33,18 @@ export default function Main() {
         <Route
           path="admin/aboutUs*"
           element={
-            <AboutUs theme={currentTheme} setCurrentTheme={setCurrentTheme}/>
+            <AboutUs theme={currentTheme} setCurrentTheme={setCurrentTheme} />
           }
         />
+        <Route path="admin/Highlights" element={<Highlights theme={currentTheme} setCurrentTheme={setCurrentTheme} />} />
+
         <Route
-          path="admin/contactUs"
+          path="admin/MissionandVission*"
           element={
-            <ContactUs/>
+            <Mission theme={currentTheme} setCurrentTheme={setCurrentTheme} />
           }
         />
+        <Route path="admin/contactUs" element={<ContactUs />} />
 
         <Route
           path="rtl/*"

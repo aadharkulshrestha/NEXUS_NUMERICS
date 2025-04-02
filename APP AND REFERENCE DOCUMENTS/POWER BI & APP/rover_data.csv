@@ -1,0 +1,6 @@
+Rover Name, Temperature, Soil Moisture, Status, Timestamp
+Rover-1,28.52,78.99,Moving backward,2025-04-02 09:48:23
+Rover-2,30.05,24.74,idle,2025-04-02 09:48:41
+Rover-3,13.44,55.81,Moving left,2025-04-02 09:48:57
+Rover-4,32.14,58.03,Moving right,2025-04-02 09:49:06
+Rover-5,16.05,73.01,Moving forward,2025-04-02 09:49:16

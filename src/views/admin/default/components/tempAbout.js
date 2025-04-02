@@ -163,14 +163,11 @@ export default function AboutUs(props) {
                     <VStack spacing={5} align="start">
                       {/* <Heading size="xl">About Us</Heading> */}
                       <Text fontSize="lg">
-                        Welcome to FleetBots! We specialize in autonomous
-                        farming solutions, providing advanced rovers for
-                        efficient agricultural tasks.
+                        Welcome to FleetBots!
                       </Text>
                       <Text fontSize="md">
-                        Our mission is to revolutionize farming through
-                        cutting-edge robotics, ensuring sustainability and
-                        productivity.
+                      At Nexus Numerics, we are passionate about leveraging cutting-edge robotics and artificial intelligence to transform agricultural practices. Recognizing the increasing demands and complexities of modern farming, we developed Slambots – a fleet of intelligent, SLAM-enabled robots designed to enhance farm supervision through distributed monitoring and autonomous navigation." At Nexus Numerics we are at the forefront of agricultural innovation, dedicated to empowering farmers with cutting-edge robotic solutions. We believe in a future where technology seamlessly integrates with traditional farming practices, leading to enhanced efficiency, optimized resource management, and ultimately, greater yields.
+                      Our core offering revolves around Slambots, our fleet of advanced, SLAM (Simultaneous Localization and Mapping)-enabled agricultural robots. Recognizing the increasing demands and complexities of modern farming, we developed Slambots to address the critical need for comprehensive farm supervision through distributed monitoring and autonomous navigation.
                       </Text>
                     </VStack>
                   </Container>
