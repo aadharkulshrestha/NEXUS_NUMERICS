@@ -26,23 +26,26 @@ import { MdCancel, MdCheckCircle, MdOutlineError } from 'react-icons/md';
 
 const columnHelper = createColumnHelper();
 
-export default function ComplexTable() {
+export default function TaskTable() {
+  const [selectedTask, setSelectedTask] = useState('');
   const [tableData, setTableData] = useState([]);
   const [sorting, setSorting] = React.useState([]);
   const textColor = useColorModeValue('secondaryGray.900', 'white');
   const borderColor = useColorModeValue('gray.200', 'whiteAlpha.100');
 
   useEffect(() => {
-    fetch('https://fleetbots-production.up.railway.app/api/fleet/status?session_id=49dd464f-0516-40aa-894c-91455e9eacf9')
+    fetch(
+      'https://fleetbots-production.up.railway.app/api/fleet/status?session_id=49dd464f-0516-40aa-894c-91455e9eacf9',
+    )
       .then((res) => res.json())
       .then((data) => {
         // Format the API response data into an array
         const formattedData = Object.keys(data).map((key) => ({
-          name: key, 
+          name: key,
           status: data[key].status,
           task: data[key].task || 'N/A',
-          coordinates: data[key].coordinates, 
-          battery: data[key].battery, 
+          coordinates: data[key].coordinates,
+          battery: data[key].battery,
         }));
 
         setTableData(formattedData);
@@ -136,54 +139,92 @@ export default function ComplexTable() {
         </Text>
       ),
     }),
-    columnHelper.accessor('coordinates', {
-      id: 'coordinates',
+    columnHelper.accessor('assignTask', {
+      id: 'assignTask',
       header: () => (
-        <Text
-          justifyContent="space-between"
-          align="center"
-          fontSize={{ sm: '10px', lg: '12px' }}
-          color="gray.400"
-        >
-          COORDINATES
+        <Text fontSize={{ sm: '10px', lg: '12px' }} color="gray.400">
+          ASSIGN TASK
         </Text>
       ),
       cell: (info) => {
-        const coords = info.getValue();
+        const roverName = info.row.original.name;
         return (
-          <Text color={textColor} fontSize="sm" fontWeight="700">
-            {coords ? `${coords[0]}, ${coords[1]}` : 'N/A'}
-          </Text>
+          <select
+            value={info.row.original.selectedTask || ""}
+            onChange={(event) => {
+              const newTask = event.target.value;
+              setTableData((prevData) =>
+                prevData.map((rover) =>
+                  rover.name === roverName ? { ...rover, selectedTask: newTask } : rover
+                )
+              );
+            }}
+            style={{
+              padding: '5px',
+              borderRadius: '5px',
+              border: `1px solid ${borderColor}`,
+              color: textColor,
+            }}
+          >
+            <option value="" disabled>Select Task</option>
+            <option value="Soil Analysis">Soil Analysis</option>
+            <option value="Crop Monitoring">Crop Monitoring</option>
+            <option value="Weeding">Weeding</option>
+            <option value="Irrigation">Irrigation</option>
+          </select>
         );
       },
     }),
-    columnHelper.accessor('battery', {
-      id: 'battery',
+    columnHelper.accessor('action', {
+      id: 'action',
       header: () => (
-        <Text
-          justifyContent="space-between"
-          align="center"
-          fontSize={{ sm: '10px', lg: '12px' }}
-          color="gray.400"
-        >
-          BATTERY
+        <Text fontSize={{ sm: '10px', lg: '12px' }} color="gray.400">
+          ASSIGN TASK
         </Text>
       ),
-      cell: (info) => (
-        <Flex align="center">
-          <Progress
-            variant="table"
-            colorScheme="brandScheme"
-            h="8px"
-            w="108px"
-            value={info.getValue()}
-            title={`${info.getValue()}%`} // Add hover tooltip with percentage
-          />
-          <Text ml="2" color={textColor} fontSize="sm" fontWeight="700">
-            {info.getValue()}%
-          </Text>
-        </Flex>
-      ),
+      cell: (info) => {
+        const roverName = info.row.original.name;
+        const selectedTask = info.row.original.selectedTask || "";
+    
+        const handleAssignTask = async () => {
+          if (!selectedTask) {
+            alert("Please select a task before assigning.");
+            return;
+          }
+    
+          try {
+            const response = await fetch(
+              `https://fleetbots-production.up.railway.app/api/rover/${roverName}/task?session_id=49dd464f-0516-40aa-894c-91455e9eacf9&task=${selectedTask}`,
+              { method: "POST" }
+            );
+    
+            if (response.ok) {
+                alert(`Task "${selectedTask}" assigned to ${roverName} successfully!`);
+                window.location.reload();
+            } else {
+              alert(`Failed to assign task to ${roverName}`);
+            }
+          } catch (error) {
+            console.error("Error assigning task:", error);
+          }
+        };
+    
+        return (
+          <button
+            style={{
+              padding: '5px 10px',
+              borderRadius: '5px',
+              backgroundColor: 'blue',
+              color: 'white',
+              border: 'none',
+              cursor: 'pointer',
+            }}
+            onClick={handleAssignTask}
+          >
+            Assign
+          </button>
+        );
+      },
     }),
   ];
 
@@ -206,8 +247,13 @@ export default function ComplexTable() {
       overflowX={{ sm: 'scroll', lg: 'hidden' }}
     >
       <Flex px="25px" mb="8px" justifyContent="space-between" align="center">
-        <Text color={textColor} fontSize="22px" fontWeight="700" lineHeight="100%">
-          Activity Table
+        <Text
+          color={textColor}
+          fontSize="22px"
+          fontWeight="700"
+          lineHeight="100%"
+        >
+          Assigning Table
         </Text>
       </Flex>
       <Box>
@@ -230,7 +276,10 @@ export default function ComplexTable() {
                       fontSize={{ sm: '10px', lg: '12px' }}
                       color="gray.400"
                     >
-                      {flexRender(header.column.columnDef.header, header.getContext())}
+                      {flexRender(
+                        header.column.columnDef.header,
+                        header.getContext(),
+                      )}
                       {{
                         asc: '',
                         desc: '',
@@ -245,7 +294,12 @@ export default function ComplexTable() {
             {table.getRowModel().rows.map((row) => (
               <Tr key={row.id}>
                 {row.getVisibleCells().map((cell) => (
-                  <Td key={cell.id} fontSize={{ sm: '14px' }} minW={{ sm: '150px', md: '200px', lg: 'auto' }} borderColor="transparent">
+                  <Td
+                    key={cell.id}
+                    fontSize={{ sm: '14px' }}
+                    minW={{ sm: '150px', md: '200px', lg: 'auto' }}
+                    borderColor="transparent"
+                  >
                     {flexRender(cell.column.columnDef.cell, cell.getContext())}
                   </Td>
                 ))}

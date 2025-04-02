@@ -3,6 +3,8 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import {} from 'react-router-dom';
 import AuthLayout from './layouts/auth';
 import AdminLayout from './layouts/admin';
+import AboutUs from '../src/views/admin/default/components/tempAbout';
+import ContactUs from './views/admin/default/components/tempContact';
 import RTLLayout from './layouts/rtl';
 import {
   ChakraProvider,
@@ -25,6 +27,19 @@ export default function Main() {
             <AdminLayout theme={currentTheme} setTheme={setCurrentTheme} />
           }
         />
+        <Route
+          path="admin/aboutUs*"
+          element={
+            <AboutUs theme={currentTheme} setCurrentTheme={setCurrentTheme}/>
+          }
+        />
+        <Route
+          path="admin/contactUs"
+          element={
+            <ContactUs/>
+          }
+        />
+
         <Route
           path="rtl/*"
           element={

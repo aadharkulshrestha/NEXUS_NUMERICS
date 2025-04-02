@@ -11,10 +11,8 @@ import {
 
 // Admin Imports
 import MainDashboard from 'views/admin/default';
-import NFTMarketplace from 'views/admin/marketplace';
-import Profile from 'views/admin/profile';
-import DataTables from 'views/admin/dataTables';
-import RTL from 'views/admin/rtl';
+import AboutUs from '../src/views/admin/default/components/tempAbout';
+import ContactUs from './views/admin/default/components/tempContact';
 
 // Auth Imports
 import SignInCentered from 'views/auth/signIn';
@@ -26,6 +24,20 @@ const routes = [
     path: '/default',
     icon: <Icon as={MdHome} width="20px" height="20px" color="inherit" />,
     component: <MainDashboard />,
+  },
+  {
+    name: 'About Us',
+    layout: '/admin',
+    path: '/aboutUs',
+    icon: <Icon as={MdHome} width="20px" height="20px" color="inherit" />,
+    component: <AboutUs />,
+  },
+  {
+    name: 'Contact Us',
+    layout: '/admin',
+    path: '/contactUs',
+    icon: <Icon as={MdHome} width="20px" height="20px" color="inherit" />,
+    component: <ContactUs />,
   },
   // {
   //   name: 'NFT Marketplace',
