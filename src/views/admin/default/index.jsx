@@ -15,7 +15,7 @@ import { MdAttachMoney, MdBarChart } from 'react-icons/md';
 
 import ComplexTable from 'views/admin/default/components/ComplexTable';
 import TaskTable from 'views/admin/default/components/TaskTable';
-
+import Chart from 'views/admin/default/components/Chart'
 import { useEffect, useState } from 'react';
 import { columnsDataComplex } from 'views/admin/default/variables/columnsData';
 import tableDataComplex from 'views/admin/default/variables/tableDataComplex.json';
@@ -158,6 +158,10 @@ export default function UserReports() {
           columnsData={columnsDataComplex}
           tableData={tableDataComplex}
         />
+      </SimpleGrid>
+
+      <SimpleGrid gap="20px" mb="20px" w="100%">
+        <Chart/>
       </SimpleGrid>
     </Box>
   );
